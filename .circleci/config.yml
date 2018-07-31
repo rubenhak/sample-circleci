@@ -4,20 +4,19 @@ jobs:
     docker:
       - image: circleci/ruby:2.4.1-jessie
     steps:
-      - checkout
       - run:
           name: Install node and npm
           command: |
             curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
             sudo apt-get install -y nodejs
             node --version && npm -v
-
-      - run: echo "A first hello"
       - run:
-          name: Install Serverless CLI and dependencies
+          name: Install Berlioz CLI
           command: |
-            sudo npm i -g serverless
-            npm install
+            sudo npm i -g berlioz
+      - checkout
+      - run: echo "A first hello"
+
 workflows:
   version: 2
   one_and_two:
