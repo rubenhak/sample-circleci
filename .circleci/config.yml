@@ -15,7 +15,12 @@ jobs:
           command: |
             sudo npm i -g berlioz
       - checkout
-      - run: echo "A first hello"
+      - run: 
+          name: Project File Structure
+          command: ls -la
+      - run: 
+          name: Service Definitions
+          command: berlioz output-definitions
 
 workflows:
   version: 2
