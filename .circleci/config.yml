@@ -29,6 +29,9 @@ jobs:
           name: Berlioz Build Images
           command: sudo -E bash -c 'berlioz build'
       - run: 
+          name: Berlioz Login
+          command: sudo -E bash -c 'berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS'
+      - run: 
           name: Docker ps
           command: docker ps
       # - run: 
