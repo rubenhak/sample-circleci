@@ -36,7 +36,7 @@ jobs:
           command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
       - run: 
           name: Berlioz Output Endpoint
-          command: berlioz endpoint --deployment test --cluster hello --region us-east-1
+          command: berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web
 
 workflows:
   version: 2
