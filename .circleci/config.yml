@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  one:
+  deliver_to_aws:
     docker:
       - image: circleci/ruby:2.4.1-jessie
     steps:
@@ -40,9 +40,12 @@ jobs:
             url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
             echo "Service Url: $url"
             curl -s -S $url 2>&1
+      - run: 
+          name: Berlioz Trigger Stop
+          command: berlioz stop --deployment test --cluster hello --region us-east-1
 
 workflows:
   version: 2
-  one_and_two:
+  deliver:
     jobs:
-      - one
+      - deliver_to_aws
