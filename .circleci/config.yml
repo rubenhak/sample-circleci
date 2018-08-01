@@ -35,8 +35,11 @@ jobs:
           name: Berlioz Wait Ready
           command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
       - run: 
-          name: Berlioz Output Endpoint
-          command: berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web
+          name: Berlioz Test Endpoint
+          command: |
+            url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
+            echo "Service Url: $url"
+            curl -s -S $url 2>&1
 
 workflows:
   version: 2
