@@ -20,34 +20,23 @@ jobs:
           name: Project File Structure
           command: ls -la
       - run: 
-          name: Service Definitions
+          name: Output Service Definitions
           command: sudo berlioz output-definitions
       - run: 
-          name: Service Definitions SUDO
-          command: sudo -E bash -c 'berlioz output-definitions'
-      # - run: 
-      #     name: Berlioz Build Images
-      #     command: sudo -E bash -c 'berlioz build'
-      - run: 
           name: Berlioz Login
-          command: sudo -E bash -c 'berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS'
+          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
       - run: 
           name: Berlioz Build and Push Images
           command: sudo -E bash -c 'berlioz push'
       - run: 
           name: Berlioz Trigger Run
-          command: sudo -E bash -c 'berlioz run --deployment test --cluster hello --region us-east-1'
+          command: berlioz run --deployment test --cluster hello --region us-east-1
       - run: 
-          name: Berlioz Check Status
-          command: sudo -E bash -c 'berlioz status'
-      # - run: 
-      #     name: Manual Docker build
-      #     command: |
-      #       cd app
-      #       docker build -t hello-app .
+          name: Berlioz Wait Ready
+          command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
       - run: 
-          name: List Docker Images
-          command: docker images
+          name: Berlioz Output Endpoint
+          command: berlioz endpoint --deployment test --cluster hello --region us-east-1
 
 workflows:
   version: 2
