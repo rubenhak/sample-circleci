@@ -23,8 +23,11 @@ jobs:
           name: Service Definitions
           command: sudo berlioz output-definitions
       - run: 
+          name: Service Definitions SUDO
+          command: sudo -E bash -c 'berlioz output-definitions'
+      - run: 
           name: Berlioz Build Images
-          command: sudo berlioz build
+          command: sudo -E bash -c 'berlioz build'
       - run: 
           name: Docker ps
           command: docker ps
