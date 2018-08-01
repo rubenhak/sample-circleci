@@ -27,10 +27,13 @@ jobs:
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
       - run: 
           name: Berlioz Build and Push Images
-          command: sudo -E bash -c 'berlioz push'
+          command: sudo -E bash -c 'berlioz push --version-metadata-path workspace/berlioz-version-metadata'
+      - run: 
+          name: Berlioz Version Metadata
+          command: cat workspace/berlioz-version-metadata
       - run: 
           name: Berlioz Trigger Run
-          command: berlioz run --deployment test --cluster hello --region us-east-1
+          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path workspace/berlioz-version-metadata
       - run: 
           name: Berlioz Wait Ready
           command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
@@ -40,9 +43,9 @@ jobs:
             url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
             echo "Service Url: $url"
             curl -s -S $url 2>&1
-      - run: 
-          name: Berlioz Trigger Stop
-          command: berlioz stop --deployment test --cluster hello --region us-east-1
+      # - run: 
+      #     name: Berlioz Trigger Stop
+      #     command: berlioz stop --deployment test --cluster hello --region us-east-1
 
 workflows:
   version: 2
