@@ -25,15 +25,21 @@ jobs:
       - run: 
           name: Service Definitions SUDO
           command: sudo -E bash -c 'berlioz output-definitions'
-      - run: 
-          name: Berlioz Build Images
-          command: sudo -E bash -c 'berlioz build'
+      # - run: 
+      #     name: Berlioz Build Images
+      #     command: sudo -E bash -c 'berlioz build'
       - run: 
           name: Berlioz Login
           command: sudo -E bash -c 'berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS'
       - run: 
-          name: Docker ps
-          command: docker ps
+          name: Berlioz Build and Push Images
+          command: sudo -E bash -c 'berlioz push'
+      - run: 
+          name: Berlioz Trigger Run
+          command: sudo -E bash -c 'berlioz run --deployment test --cluster hello --region us-east-1'
+      - run: 
+          name: Berlioz Check Status
+          command: sudo -E bash -c 'berlioz status'
       # - run: 
       #     name: Manual Docker build
       #     command: |
