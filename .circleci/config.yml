@@ -24,7 +24,7 @@ jobs:
   #     - run: ls -la berlioz_workspace/
   push_images:
     docker:
-      - image: circleci/ruby:2.4.1-jessie
+      - image: circleci/openjdk:8-jdk-node
     steps:
       - setup_remote_docker
       - run:
@@ -54,16 +54,13 @@ jobs:
 
   test_in_cloud:
     docker:
-      - image: circleci/ruby:2.4.1-jessie
+      - image: berliozcloud/circleci-cli
     steps:
       - attach_workspace:
           at: .
       - run: 
           name: Berlioz Version Metadata
           command: cat berlioz_workspace/version-metadata
-      - run:
-          name: Berlioz Setup
-          command: curl -sL https://raw.githubusercontent.com/berlioz-the/berlioz/master/support/setup | sudo -E bash -
       - run: 
           name: Berlioz Login
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
@@ -85,16 +82,13 @@ jobs:
 
   deploy_to_production:
     docker:
-      - image: circleci/ruby:2.4.1-jessie
+      - image: berliozcloud/circleci-cli
     steps:
       - attach_workspace:
           at: .
       - run: 
           name: Berlioz Version Metadata
           command: cat berlioz_workspace/version-metadata
-      - run:
-          name: Berlioz Setup
-          command: curl -sL https://raw.githubusercontent.com/berlioz-the/berlioz/master/support/setup | sudo -E bash -
       - run: 
           name: Berlioz Login
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
