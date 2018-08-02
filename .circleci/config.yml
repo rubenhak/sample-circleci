@@ -67,6 +67,6 @@ workflows:
     jobs:
       - experiment
       - follow_up:
-        requires:
-          - experiment
+          requires:
+            - experiment
       # - deliver_to_aws
