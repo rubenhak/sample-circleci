@@ -65,26 +65,24 @@ jobs:
     steps:
       - attach_workspace:
           at: .
-      - run: ls -la
-      - run: ls -la berlioz_workspace/
       - run: 
           name: Berlioz Version Metadata
           command: cat berlioz_workspace/version-metadata
-
-  # deliver_to_aws:
-
-  #     - run: 
-  #         name: Berlioz Trigger Run
-  #         command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path workspace/berlioz-version-metadata
-  #     - run: 
-  #         name: Berlioz Wait Ready
-  #         command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
-  #     - run: 
-  #         name: Berlioz Test Endpoint
-  #         command: |
-  #           url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
-  #           echo "Service Url: $url"
-  #           curl -s -S $url 2>&1
+      - run: 
+          name: Berlioz Login
+          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
+      - run: 
+          name: Berlioz Trigger Run
+          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata
+      - run: 
+          name: Berlioz Wait Ready
+          command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
+      - run: 
+          name: Berlioz Test Endpoint
+          command: |
+            url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
+            echo "Service Url: $url"
+            curl -s -S $url 2>&1
       # - run: 
       #     name: Berlioz Trigger Stop
       #     command: berlioz stop --deployment test --cluster hello --region us-east-1
