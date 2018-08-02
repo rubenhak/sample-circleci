@@ -11,7 +11,7 @@ jobs:
       - run: ls -la berlioz_workspace/
       - run: pwd
       - persist_to_workspace:
-          root: .
+          root: ~/project
   follow_up:
     docker:
       - image: circleci/ruby:2.4.1-jessie
