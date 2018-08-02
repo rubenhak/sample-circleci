@@ -13,7 +13,7 @@ jobs:
       - persist_to_workspace:
           root: .
           paths:
-            - berlioz_workspace
+              - berlioz_workspace
   follow_up:
     docker:
       - image: circleci/ruby:2.4.1-jessie
