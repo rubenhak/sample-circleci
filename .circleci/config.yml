@@ -9,7 +9,7 @@ jobs:
       - run: echo "Hello, world!" > berlioz_workspace/echo-output
       - run: ls -la
       - run: ls -la berlioz_workspace/
-      - persist_to_workspace
+      - persist_to_workspace:
         root: .
   follow_up:
     docker:
