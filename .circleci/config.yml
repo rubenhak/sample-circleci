@@ -19,9 +19,9 @@ jobs:
       - image: circleci/ruby:2.4.1-jessie
     steps:
       - attach_workspace:
-          at: workspace
+          at: .
       - run: ls -la
-      - run: ls -la workspace/
+      - run: ls -la berlioz_workspace/
   deliver_to_aws:
     docker:
       - image: circleci/ruby:2.4.1-jessie
