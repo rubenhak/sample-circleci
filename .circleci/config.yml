@@ -1,28 +1,28 @@
 version: 2
 jobs:
-  experiment:
-    docker:
-      - image: circleci/ruby:2.4.1-jessie
-    steps:
-      - checkout
-      - run: mkdir -p berlioz_workspace
-      - run: echo "Hello, world!" > berlioz_workspace/echo-output
-      - run: ls -la
-      - run: ls -la berlioz_workspace/
-      - run: pwd
-      - persist_to_workspace:
-          root: .
-          paths:
-              - berlioz_workspace
-  follow_up:
-    docker:
-      - image: circleci/ruby:2.4.1-jessie
-    steps:
-      - attach_workspace:
-          at: .
-      - run: ls -la
-      - run: ls -la berlioz_workspace/
-  deliver_to_aws:
+  # experiment:
+  #   docker:
+  #     - image: circleci/ruby:2.4.1-jessie
+  #   steps:
+  #     - checkout
+  #     - run: mkdir -p berlioz_workspace
+  #     - run: echo "Hello, world!" > berlioz_workspace/echo-output
+  #     - run: ls -la
+  #     - run: ls -la berlioz_workspace/
+  #     - run: pwd
+  #     - persist_to_workspace:
+  #         root: .
+  #         paths:
+  #             - berlioz_workspace
+  # follow_up:
+  #   docker:
+  #     - image: circleci/ruby:2.4.1-jessie
+  #   steps:
+  #     - attach_workspace:
+  #         at: .
+  #     - run: ls -la
+  #     - run: ls -la berlioz_workspace/
+  push_images:
     docker:
       - image: circleci/ruby:2.4.1-jessie
     steps:
@@ -41,6 +41,13 @@ jobs:
       - run: 
           name: Project File Structure
           command: ls -la
+
+      - run: mkdir -p berlioz_workspace
+      - persist_to_workspace:
+          root: .
+          paths:
+              - berlioz_workspace
+
       - run: 
           name: Output Service Definitions
           command: sudo berlioz output-definitions
@@ -49,22 +56,34 @@ jobs:
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
       - run: 
           name: Berlioz Build and Push Images
-          command: sudo -E bash -c 'berlioz push --version-metadata-path workspace/berlioz-version-metadata'
+          command: sudo -E bash -c 'berlioz push --version-metadata-path berlioz_workspace/version-metadata'
       - run: 
           name: Berlioz Version Metadata
-          command: cat workspace/berlioz-version-metadata
-      - run: 
-          name: Berlioz Trigger Run
-          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path workspace/berlioz-version-metadata
-      - run: 
-          name: Berlioz Wait Ready
-          command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
-      - run: 
-          name: Berlioz Test Endpoint
-          command: |
-            url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
-            echo "Service Url: $url"
-            curl -s -S $url 2>&1
+          command: cat berlioz_workspace/version-metadata
+
+  test_in_cloud:
+    docker:
+      - image: circleci/ruby:2.4.1-jessie
+    steps:
+      - attach_workspace:
+          at: .
+      - run: ls -la
+      - run: ls -la berlioz_workspace/
+
+  # deliver_to_aws:
+
+  #     - run: 
+  #         name: Berlioz Trigger Run
+  #         command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path workspace/berlioz-version-metadata
+  #     - run: 
+  #         name: Berlioz Wait Ready
+  #         command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
+  #     - run: 
+  #         name: Berlioz Test Endpoint
+  #         command: |
+  #           url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
+  #           echo "Service Url: $url"
+  #           curl -s -S $url 2>&1
       # - run: 
       #     name: Berlioz Trigger Stop
       #     command: berlioz stop --deployment test --cluster hello --region us-east-1
@@ -73,8 +92,8 @@ workflows:
   version: 2
   deliver:
     jobs:
-      - experiment
-      - follow_up:
+      - push_images
+      - test_in_cloud:
           requires:
-            - experiment
+            - push_images
       # - deliver_to_aws
