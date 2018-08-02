@@ -9,11 +9,16 @@ jobs:
       - run: echo "Hello, world!" > berlioz_workspace/echo-output
       - run: ls -la
       - run: ls -la berlioz_workspace/
+      - persist_to_workspace
+        root: .
   follow_up:
     docker:
       - image: circleci/ruby:2.4.1-jessie
     steps:
+      - attach_workspace:
+        at: workspace
       - run: ls -la
+      - run: ls -la workspace/
   deliver_to_aws:
     docker:
       - image: circleci/ruby:2.4.1-jessie
