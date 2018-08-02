@@ -28,15 +28,8 @@ jobs:
     steps:
       - setup_remote_docker
       - run:
-          name: Install node and npm
-          command: |
-            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-            node --version && npm -v
-      - run:
-          name: Install Berlioz CLI
-          command: |
-            sudo npm i -g berlioz
+          name: Berlioz Setup
+          command: curl -sL https://raw.githubusercontent.com/berlioz-the/berlioz/master/support/setup | sudo -E bash -
       - checkout
       - run: 
           name: Project File Structure
@@ -86,9 +79,37 @@ jobs:
             url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
             echo "Service Url: $url"
             curl -s -S $url 2>&1
-      # - run: 
-      #     name: Berlioz Trigger Stop
-      #     command: berlioz stop --deployment test --cluster hello --region us-east-1
+      - run: 
+          name: Berlioz Trigger Stop
+          command: berlioz stop --deployment test --cluster hello --region us-east-1
+
+  deploy_to_production:
+    docker:
+      - image: circleci/ruby:2.4.1-jessie
+    steps:
+      - attach_workspace:
+          at: .
+      - run: 
+          name: Berlioz Version Metadata
+          command: cat berlioz_workspace/version-metadata
+      - run:
+          name: Berlioz Setup
+          command: curl -sL https://raw.githubusercontent.com/berlioz-the/berlioz/master/support/setup | sudo -E bash -
+      - run: 
+          name: Berlioz Login
+          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
+      - run: 
+          name: Berlioz Trigger Run
+          command: berlioz run --deployment prod --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata
+      - run: 
+          name: Berlioz Wait Ready
+          command: berlioz wait --deployment prod --cluster hello --region us-east-1 --timeout 600
+      - run: 
+          name: Berlioz Test Endpoint
+          command: |
+            url=$(berlioz endpoint --deployment prod --cluster hello --region us-east-1 --endpoint web)
+            echo "Service Url: $url"
+            curl -s -S $url 2>&1
 
 workflows:
   version: 2
@@ -98,4 +119,8 @@ workflows:
       - test_in_cloud:
           requires:
             - push_images
-      # - deliver_to_aws
+      - deploy_to_production:
+          requires:
+            - push_images
+            - test_in_cloud
+      
