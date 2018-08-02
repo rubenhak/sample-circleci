@@ -69,15 +69,8 @@ jobs:
           name: Berlioz Version Metadata
           command: cat berlioz_workspace/version-metadata
       - run:
-          name: Install node and npm
-          command: |
-            curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
-            sudo apt-get install -y nodejs
-            node --version && npm -v
-      - run:
-          name: Install Berlioz CLI
-          command: |
-            sudo npm i -g berlioz
+          name: Berlioz Setup
+          command: curl -sL https://raw.githubusercontent.com/berlioz-the/berlioz/master/support/setup | sudo -E bash -
       - run: 
           name: Berlioz Login
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
