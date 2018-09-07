@@ -45,7 +45,7 @@ jobs:
           name: Berlioz Build and Push Images
           command: sudo -E bash -c 'berlioz push --version-metadata-path berlioz_workspace/version-metadata'
       - run: 
-          name: Berlioz Version Metadata
+          name: Copy Version Metadata
           command: cat berlioz_workspace/version-metadata
       - persist_to_workspace:
           root: .
@@ -59,19 +59,16 @@ jobs:
       - attach_workspace:
           at: .
       - run: 
-          name: Berlioz Version Metadata
+          name: View Version Metadata
           command: cat berlioz_workspace/version-metadata
       - run: 
           name: Berlioz Login
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
       - run: 
           name: Berlioz Trigger Run
-          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata
+          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata --wait --timeout 600
       - run: 
-          name: Berlioz Wait Ready
-          command: berlioz wait --deployment test --cluster hello --region us-east-1 --timeout 600
-      - run: 
-          name: Berlioz Test Endpoint
+          name: Test Endpoint
           command: |
             url=$(berlioz endpoint --deployment test --cluster hello --region us-east-1 --endpoint web)
             echo "Service Url: $url"
@@ -87,19 +84,16 @@ jobs:
       - attach_workspace:
           at: .
       - run: 
-          name: Berlioz Version Metadata
+          name: View Version Metadata
           command: cat berlioz_workspace/version-metadata
       - run: 
           name: Berlioz Login
           command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
       - run: 
           name: Berlioz Trigger Run
-          command: berlioz run --deployment prod --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata
+          command: berlioz run --deployment prod --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata --wait --timeout 600
       - run: 
-          name: Berlioz Wait Ready
-          command: berlioz wait --deployment prod --cluster hello --region us-east-1 --timeout 600
-      - run: 
-          name: Berlioz Test Endpoint
+          name: Test Endpoint
           command: |
             url=$(berlioz endpoint --deployment prod --cluster hello --region us-east-1 --endpoint web)
             echo "Service Url: $url"
