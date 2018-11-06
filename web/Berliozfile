@@ -8,6 +8,7 @@ provides:
         port: 3000
         protocol: http
         load-balance: true
+        dns: true
 
 consumes:
     - service: app

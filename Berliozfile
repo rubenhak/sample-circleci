@@ -2,8 +2,15 @@
 kind: cluster
 name: hello
 
-
 provides:
     web:
         service: web
         public: true
+    jweb:
+        service: jweb
+        public: true
+
+environment:
+    HELLO_RELATIONAL_DB_NAME: demo
+    HELLO_RELATIONAL_DB_USER: berlioz
+    HELLO_RELATIONAL_DB_PASS: myPassword

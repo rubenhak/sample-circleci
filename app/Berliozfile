@@ -8,6 +8,9 @@ provides:
         port: 4000
         protocol: http
 
+consumes:
+    - service: db
+
 resources:
     memory:
         min: 128

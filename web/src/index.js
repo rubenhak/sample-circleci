@@ -5,7 +5,7 @@ const berlioz = require('berlioz-connector');
 const app = express();
 berlioz.setupExpress(app);
 
-app.use(express.static('public'))
+app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
 app.get('/', function (req, response) {
@@ -16,29 +16,57 @@ app.get('/', function (req, response) {
             {name: 'Region', value: process.env.BERLIOZ_REGION }
         ],
         peers: berlioz.service('app').all(),
-        appPeer: { }
+        entries: [],
+        appPeer: '',
+        appPeerInfo: { }
     };
 
+    var appPeer = berlioz.service('app').random();
+    if (appPeer) {
+        renderData.appPeer = appPeer.address + ':' + appPeer.port;
+    }
+
     return Promise.resolve()
+        .then(() => {
+            var options = { url: '/entries', json: true, resolveWithFullResponse: true };
+            return berlioz.service('app').request(options)
+                .then(result => {
+                    if (result) {
+                        renderData.entries = result.body;
+                        renderData.appPeerInfo.url = result.url;
+                        renderData.appPeerInfo.cardClass = 'eastern-blue';
+                        renderData.appPeerInfo.title = 'RESPONSE:';
+                        renderData.appPeerInfo.response = JSON.stringify(result.body, null, 2);
+                    } else {
+                        renderData.appPeerInfo.cardClass = 'yellow';
+                        renderData.appPeerInfo.title = 'No peers present';
+                    }
+                })
+                .catch(error => {
+                    renderData.appPeerInfo.url = error.url;
+                    renderData.appPeerInfo.cardClass = 'red';
+                    renderData.appPeerInfo.title = 'ERROR';
+                    if (error.message) {
+                        renderData.appPeerInfo.response = error.message
+                    } else {
+                        renderData.appPeerInfo.response = JSON.stringify(error, null, 2);
+                    }
+                });
+        })
         .then(() => {
             var options = { url: '/', json: true, resolveWithFullResponse: true };
             return berlioz.service('app').request(options)
                 .then(result => {
                     if (result) {
-                        renderData.appPeer.url = result.url;
-                        renderData.appPeer.cardClass = 'eastern-blue';
-                        renderData.appPeer.title = 'RESPONSE:';
-                        renderData.appPeer.response = JSON.stringify(result.body, null, 2);
-                    } else {
-                        renderData.appPeer.cardClass = 'yellow';
-                        renderData.appPeer.title = 'No peers present';
+                        renderData.appDbPeers = result.body.myDbPeers;
                     }
                 })
                 .catch(error => {
-                    renderData.appPeer.url = error.url;
-                    renderData.appPeer.cardClass = 'red';
-                    renderData.appPeer.title = 'ERROR';
-                    renderData.appPeer.response = JSON.stringify(error, null, 2);
+                })
+                .then(() => {
+                    if (!renderData.appDbPeers) {
+                        renderData.appDbPeers = {};
+                    }
                 });
         })
         .catch(error => {
@@ -50,9 +78,24 @@ app.get('/', function (req, response) {
         })
         .then(() => {
             response.render('pages/index', renderData);
-        });
+        })
+        ;
 });
 
+app.post('/new-contact', (request, response) => {
+    var options = { url: '/entry', method: 'POST', body: request.body, json: true };
+    return berlioz.service('app').request(options)
+        .then(result => {
+            console.log('**** ' + JSON.stringify(result));
+            if (!result) {
+                return response.send({ error: 'No app peers present.' });
+            }
+            return response.send(result);
+        })
+        .catch(error => {
+            return response.send({ error: error });
+        });
+});
 
 app.listen(process.env.BERLIOZ_LISTEN_PORT_DEFAULT, process.env.BERLIOZ_LISTEN_ADDRESS, (err) => {
     if (err) {

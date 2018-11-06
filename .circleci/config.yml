@@ -40,10 +40,10 @@ jobs:
           command: sudo berlioz output-definitions
       - run: 
           name: Berlioz Login
-          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
+          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS --region us-east-1
       - run: 
           name: Berlioz Build and Push Images
-          command: sudo -E bash -c 'berlioz push --version-metadata-path berlioz_workspace/version-metadata'
+          command: sudo -E bash -c 'berlioz push --version-metadata-path berlioz_workspace/version-metadata  --region us-east-1'
       - run: 
           name: Copy Version Metadata
           command: cat berlioz_workspace/version-metadata
@@ -63,10 +63,10 @@ jobs:
           command: cat berlioz_workspace/version-metadata
       - run: 
           name: Berlioz Login
-          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
+          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS --region us-east-1
       - run: 
           name: Berlioz Trigger Run
-          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata --wait --timeout 600
+          command: berlioz run --deployment test --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata --wait --timeout 900
       - run: 
           name: Test Endpoint
           command: |
@@ -88,7 +88,7 @@ jobs:
           command: cat berlioz_workspace/version-metadata
       - run: 
           name: Berlioz Login
-          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS
+          command: berlioz login --user $BERLIOZ_USER --pass $BERLIOZ_PASS --region us-east-1
       - run: 
           name: Berlioz Trigger Run
           command: berlioz run --deployment prod --cluster hello --region us-east-1 --version-metadata-path berlioz_workspace/version-metadata --wait --timeout 600
